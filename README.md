@@ -65,3 +65,6 @@ AURA is structured with a premium, obsidian-meets-gold dark-magazine aesthetic:
 - **Custom Shaders**: Includes vertex-displacement wave calculations for silk-gold fabrics, fresnel/scanline layers for holographic avatars, and procedural noise materials.
 - **Framer Motion**: Smooth entry/exit page transitions, drag-to-dock closet builders, and SVG path stroke-drawing loading checkmarks.
 - **Zustand & React Query**: Clean server cache hydration and context storage.
+=======
+# Outfitly
+
