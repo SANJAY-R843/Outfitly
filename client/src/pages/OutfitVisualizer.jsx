@@ -48,9 +48,12 @@ export const OutfitVisualizer = () => {
 
   return (
     <section className="page-container">
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: '20px', display: 'grid', gap: '10px' }}>
         <span className="section-label">3D Visualizer</span>
-        <h2 style={{ fontSize: '2rem', marginTop: '8px' }}>Outfit Visualizer</h2>
+        <h2 style={{ fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', marginTop: '8px' }}>Outfit Visualizer</h2>
+        <p style={{ maxWidth: '720px', color: 'var(--color-muted)', lineHeight: 1.7 }}>
+          Preview the silhouette in a studio-like canvas and tune the material response around the current outfit.
+        </p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(0, 0.8fr)', gap: '28px' }}>

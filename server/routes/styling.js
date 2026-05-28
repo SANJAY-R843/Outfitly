@@ -6,7 +6,7 @@ import { stylingLimiter } from '../middleware/rateLimiter.js';
 const router = express.Router();
 
 // Multi-part image uploader with rate-limiting protection
-router.post('/analyze', stylingLimiter, upload.single('image'), analyzeOutfit);
+router.post('/analyze', stylingLimiter, upload.single('outfit'), analyzeOutfit);
 
 // Get direct profile recommended outfits
 router.post('/profile-recommendations', getProfileRecommendations);

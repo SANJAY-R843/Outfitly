@@ -1,13 +1,15 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import WardrobeGrid from '../components/wardrobe/WardrobeGrid.jsx';
 import OutfitBuilder from '../components/wardrobe/OutfitBuilder.jsx';
 import MagneticButton from '../components/ui/MagneticButton.jsx';
 import { useWardrobe } from '../hooks/useWardrobe.js';
 
 export const Wardrobe = () => {
-  const { items, activeOutfit, addItem, removeItem, addToOutfit, removeFromOutfit, clearOutfit, loading, error } = useWardrobe();
+  const navigate = useNavigate();
+  const { items, activeOutfit, addItem, removeItem, addToOutfit, removeFromOutfit, clearOutfit, addOutfit, loading, error } = useWardrobe();
   const builderRef = useRef(null);
   const [showAdd, setShowAdd] = useState(false);
   const [isOverBuilder, setIsOverBuilder] = useState(false);
@@ -45,6 +47,15 @@ export const Wardrobe = () => {
     setIsOverBuilder(false);
   };
 
+  const handleSaveLook = () => {
+    if (activeOutfit.length === 0) return;
+    addOutfit({
+      name: `Saved Look ${new Date().toLocaleDateString()}`,
+      items: activeOutfit,
+      createdAt: new Date().toISOString()
+    });
+  };
+
   const handleDragMove = (item, info) => {
     if (!builderRef.current) return;
     const rect = builderRef.current.getBoundingClientRect();
@@ -54,10 +65,13 @@ export const Wardrobe = () => {
 
   return (
     <section className="page-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '16px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'grid', gap: '10px' }}>
           <span className="section-label">Virtual Wardrobe</span>
-          <h2 style={{ fontSize: '2rem', marginTop: '8px' }}>My Wardrobe</h2>
+          <h2 style={{ fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', marginTop: '8px' }}>My Wardrobe</h2>
+          <p style={{ maxWidth: '680px', color: 'var(--color-muted)', lineHeight: 1.7 }}>
+            Curate pieces, build outfits, and keep the inventory lightweight enough for fast styling feedback.
+          </p>
         </div>
         <button
           onClick={() => setShowAdd(true)}
@@ -106,7 +120,7 @@ export const Wardrobe = () => {
             activeOutfit={activeOutfit}
             onRemoveItem={removeFromOutfit}
             onClearAll={clearOutfit}
-            onSaveLook={() => null}
+            onSaveLook={handleSaveLook}
             isDragOver={isOverBuilder}
           />
         </div>
@@ -123,8 +137,8 @@ export const Wardrobe = () => {
         }}
       >
         <span style={{ fontSize: '0.85rem' }}>Build an Outfit</span>
-        <MagneticButton variant="secondary" onClick={() => window.location.assign('/visualizer')}>
-          Open Visualizer {'->'}
+        <MagneticButton variant="secondary" onClick={() => navigate('/visualizer')}>
+          Open Visualizer
         </MagneticButton>
       </div>
 

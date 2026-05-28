@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import BodyTypeSelector from '../components/styling/BodyTypeSelector.jsx';
@@ -16,6 +16,12 @@ export const Profile = () => {
   const [selectedOccasions, setSelectedOccasions] = useState(occasions);
   const [selectedColors, setSelectedColors] = useState(colorPreferences);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    setSelectedBody(bodyType);
+    setSelectedOccasions(occasions);
+    setSelectedColors(colorPreferences);
+  }, [bodyType, occasions, colorPreferences]);
 
   const toggleOccasion = (id) => {
     setSelectedOccasions((prev) => (
@@ -38,9 +44,9 @@ export const Profile = () => {
 
     if (Object.keys(nextErrors).length === 0) {
       updateProfile({
-        type: selectedBody,
-        selectedOccasions,
-        selectedColors
+        bodyType: selectedBody,
+        occasions: selectedOccasions,
+        colorPreferences: selectedColors
       });
       navigate('/analyze');
     }
@@ -58,13 +64,16 @@ export const Profile = () => {
 
   return (
     <section className="page-container">
-      <div style={{ marginBottom: '30px' }}>
+      <div style={{ marginBottom: '30px', display: 'grid', gap: '12px' }}>
         <span className="section-label">Step 1 - Profile Setup</span>
-        <h2 style={{ fontSize: '2rem', marginTop: '8px' }}>Tell AURA about you</h2>
+        <h2 style={{ fontSize: 'clamp(2.1rem, 4vw, 3.6rem)', marginTop: '8px' }}>Tell AURA about you</h2>
+        <p style={{ maxWidth: '680px', color: 'var(--color-muted)', lineHeight: 1.7 }}>
+          Set your silhouette, occasions, and palette so the platform can shape recommendations around your actual style signals.
+        </p>
       </div>
 
-      <div style={{ display: 'grid', gap: '40px' }}>
-        <div>
+      <div style={{ display: 'grid', gap: '24px' }}>
+        <div className="glass-card" style={{ padding: '24px' }}>
           <h4 style={{ marginBottom: '16px' }}>Body Type</h4>
           <BodyTypeSelector selectedType={selectedBody} onSelect={setSelectedBody} />
           {errors.bodyType && (
@@ -74,7 +83,7 @@ export const Profile = () => {
           )}
         </div>
 
-        <div>
+        <div className="glass-card" style={{ padding: '24px' }}>
           <h4 style={{ marginBottom: '16px' }}>Occasion Preferences</h4>
           <OccasionPicker selectedOccasions={selectedOccasions} onToggle={toggleOccasion} />
           {errors.occasions && (
@@ -84,7 +93,7 @@ export const Profile = () => {
           )}
         </div>
 
-        <div>
+        <div className="glass-card" style={{ padding: '24px' }}>
           <h4 style={{ marginBottom: '16px' }}>Color Preferences</h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' }}>
             <div style={wheelStyle} />
@@ -102,7 +111,7 @@ export const Profile = () => {
         </div>
       </div>
 
-      <div style={{ marginTop: '40px' }}>
+      <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'flex-end' }}>
         <MagneticButton variant="primary" onClick={handleSave}>
           Continue
         </MagneticButton>

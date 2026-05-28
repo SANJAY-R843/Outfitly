@@ -7,7 +7,7 @@ export const useBodyType = () => {
   const currentMetadata = getBodyTypeData(bodyType);
 
   const changeBodyType = (newType) => {
-    updateProfile({ type: newType });
+    updateProfile({ bodyType: newType });
   };
 
   return {

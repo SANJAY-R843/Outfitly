@@ -11,7 +11,7 @@ import { useAI } from '../hooks/useAI.js';
 import { useUserProfile } from '../context/UserProfileContext.jsx';
 
 export const StyleAnalysis = () => {
-  const { bodyType, occasions, colorPreferences } = useUserProfile();
+  const { bodyType, occasions, colorPreferences, userName } = useUserProfile();
   const { analyzing, analysisResult, runOutfitAnalysis, error } = useAI();
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -33,7 +33,8 @@ export const StyleAnalysis = () => {
     try {
       await runOutfitAnalysis(file, bodyType || 'hourglass', occasions[0] || 'Casual', {
         colors: colorPreferences,
-        occasions
+        occasions,
+        userName
       });
     } catch (err) {
       setActionError(err.message || 'Unable to analyze this outfit.');
@@ -43,9 +44,12 @@ export const StyleAnalysis = () => {
   return (
     <section className="page-container">
       <div style={{ display: 'grid', gap: '40px' }}>
-        <div>
+        <div style={{ display: 'grid', gap: '10px' }}>
           <span className="section-label">Style Analysis</span>
-          <h2 style={{ fontSize: '2rem', marginTop: '8px' }}>Analyze Outfit</h2>
+          <h2 style={{ fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', marginTop: '8px' }}>Analyze Outfit</h2>
+          <p style={{ maxWidth: '720px', color: 'var(--color-muted)', lineHeight: 1.7 }}>
+            Scan a look, then let AURA translate the composition into style notes, palette guidance, and next-step suggestions.
+          </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '28px' }}>
@@ -136,6 +140,17 @@ export const StyleAnalysis = () => {
 
         {analysisResult?.stylingConsultation && (
           <StyleSuggestions suggestions={analysisResult.stylingConsultation} />
+        )}
+
+        {analysisResult?.analysis?.bodyRecommendations && (
+          <div className="glass-card" style={{ padding: '24px' }}>
+            <h3 style={{ marginBottom: '16px' }}>Body Type Guidance</h3>
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {(analysisResult.analysis.bodyRecommendations.doList || []).slice(0, 3).map((item) => (
+                <div key={item} style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>{item}</div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </section>

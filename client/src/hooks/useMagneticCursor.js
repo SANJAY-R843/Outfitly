@@ -1,63 +1,39 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-/**
- * Returns a React Ref that attracts the target element to the cursor position on hover.
- * Perfect for luxury call-to-actions, buttons, and navigation nodes.
- */
-export const useMagneticCursor = (strength = 0.35) => {
-  const elementRef = useRef(null);
+const useMagneticCursor = (strength = 0.25) => {
+  const ref = useRef(null);
 
   useEffect(() => {
-    const el = elementRef.current;
-    if (!el) return;
+    const element = ref.current;
+    if (!element) return undefined;
 
-    const handleMouseMove = (e) => {
-      const rect = el.getBoundingClientRect();
-      
-      // Calculate coordinates relative to center of element
-      const elCenterX = rect.left + rect.width / 2;
-      const elCenterY = rect.top + rect.height / 2;
-      
-      // Calculate distance between mouse and center
-      const distX = e.clientX - elCenterX;
-      const distY = e.clientY - elCenterY;
-      const distance = Math.sqrt(distX * distX + distY * distY);
-      
-      const magneticRadius = 80; // Proximity in pixels to trigger attraction
+    const handleMove = (event) => {
+      const bounds = element.getBoundingClientRect();
+      const centerX = bounds.left + bounds.width / 2;
+      const centerY = bounds.top + bounds.height / 2;
+      const offsetX = (event.clientX - centerX) * strength;
+      const offsetY = (event.clientY - centerY) * strength;
 
-      if (distance < magneticRadius) {
-        // Elastic pull inside boundary
-        const pullX = distX * strength;
-        const pullY = distY * strength;
-        
-        el.style.transform = `translate3d(${pullX}px, ${pullY}px, 0)`;
-        el.style.transition = 'transform 0.1s cubic-bezier(0.25, 1, 0.5, 1)';
-        el.style.boxShadow = '0 0 25px rgba(201, 168, 76, 0.2)';
-      } else {
-        // Return smoothly to original position
-        el.style.transform = 'translate3d(0, 0, 0)';
-        el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-        el.style.boxShadow = '';
-      }
+      element.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+      element.style.transition = 'transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1)';
+      element.style.boxShadow = '0 0 25px rgba(232, 216, 196, 0.16)';
     };
 
-    const handleMouseLeave = () => {
-      el.style.transform = 'translate3d(0, 0, 0)';
-      el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-      el.style.boxShadow = '';
+    const handleLeave = () => {
+      element.style.transform = 'translate3d(0, 0, 0)';
+      element.style.boxShadow = 'none';
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    el.addEventListener('mouseleave', handleMouseLeave);
+    element.addEventListener('mousemove', handleMove);
+    element.addEventListener('mouseleave', handleLeave);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (el) {
-        el.removeEventListener('mouseleave', handleMouseLeave);
-      }
+      element.removeEventListener('mousemove', handleMove);
+      element.removeEventListener('mouseleave', handleLeave);
     };
   }, [strength]);
 
-  return elementRef;
+  return ref;
 };
+
 export default useMagneticCursor;

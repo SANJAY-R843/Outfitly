@@ -4,6 +4,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 45000, // Large timeout for AI analysis Vision pipelines
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   }

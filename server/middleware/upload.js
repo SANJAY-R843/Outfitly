@@ -4,7 +4,9 @@ import multer from 'multer';
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(new Error('Invalid format. Please upload an image file (PNG, JPG, JPEG, WEBP).'), false);
@@ -15,7 +17,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 8 * 1024 * 1024 // 8 MB limit
+    fileSize: 10 * 1024 * 1024 // 10 MB limit
   }
 });
 

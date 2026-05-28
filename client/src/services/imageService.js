@@ -19,12 +19,12 @@ export const revokeImagePreviewUrl = (url) => {
  * Validates uploaded photo parameters before server uploads.
  */
 export const validateImageFile = (file) => {
-  const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
-  const maxSize = 8 * 1024 * 1024; // 8MB
+  const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  const maxSize = 10 * 1024 * 1024; // 10MB
 
   if (!file) return { valid: false, error: 'No image uploaded.' };
   if (!validTypes.includes(file.type)) return { valid: false, error: 'Invalid photo format. Please select JPEG, PNG, or WEBP.' };
-  if (file.size > maxSize) return { valid: false, error: 'Photo is too heavy. Maximum file size is 8MB.' };
+  if (file.size > maxSize) return { valid: false, error: 'Photo is too heavy. Maximum file size is 10MB.' };
 
   return { valid: true };
 };

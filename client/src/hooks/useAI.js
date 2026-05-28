@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { analyzeOutfitPhoto, fetchTrends } from '../services/fashionAI.js';
+import { analyzeStyle, analyzeTrends } from '../services/fashionAI.js';
 
 export const useAI = () => {
   const [analyzing, setAnalyzing] = useState(false);
@@ -12,17 +12,21 @@ export const useAI = () => {
     try {
       setAnalyzing(true);
       setError(null);
-      const response = await analyzeOutfitPhoto(imageFile, bodyType, occasion, preferences);
-      if (response && response.success) {
+      const response = await analyzeStyle(imageFile, {
+        bodyType,
+        occasion,
+        preferences
+      });
+      if (response) {
         setAnalysisResult(response);
         const history = localStorage.getItem('aura_analysis_history');
         const parsedHistory = history ? JSON.parse(history) : [];
         parsedHistory.unshift({
           id: `scan-${Date.now()}`,
           date: new Date().toISOString(),
-          styleScore: response.analysis.styleScore,
-          currentStyle: response.analysis.currentStyle,
-          colors: response.analysis.colorPalette
+          styleScore: response.styleScore,
+          currentStyle: response.currentStyle,
+          colors: response.colorPalette
         });
         localStorage.setItem('aura_analysis_history', JSON.stringify(parsedHistory.slice(0, 10)));
       }
@@ -39,8 +43,8 @@ export const useAI = () => {
     try {
       setLoadingTrends(true);
       setError(null);
-      const response = await fetchTrends(season, location, closetItems);
-      if (response && response.success) {
+      const response = await analyzeTrends(season, location, closetItems);
+      if (response) {
         setTrends(response);
       }
       return response;

@@ -44,7 +44,7 @@ export const Footer = () => {
               lineHeight: '1.6'
             }}
           >
-            A luxury fashion intelligence platform powered by Claude vision + text models. Editorial-grade styling and cyber couture insight.
+            A luxury fashion intelligence platform powered by Gemini vision + text models. Editorial-grade styling and coffee-toned runway insight.
           </p>
         </div>
 

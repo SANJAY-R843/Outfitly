@@ -15,9 +15,12 @@ export const Trends = () => {
 
   return (
     <section className="page-container">
-      <div style={{ marginBottom: '24px' }}>
+      <div style={{ marginBottom: '24px', display: 'grid', gap: '10px' }}>
         <span className="section-label">Trend Report - SS 2026</span>
-        <h2 style={{ fontSize: '2rem', marginTop: '8px' }}>Trend Intelligence</h2>
+        <h2 style={{ fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', marginTop: '8px' }}>Trend Intelligence</h2>
+        <p style={{ maxWidth: '720px', color: 'var(--color-muted)', lineHeight: 1.7 }}>
+          AURA compares your wardrobe with seasonal movement and surfaces where your closet already aligns with the runway.
+        </p>
       </div>
 
       {loadingTrends && <LoadingOrb message="AURA is forecasting runway signals..." />}

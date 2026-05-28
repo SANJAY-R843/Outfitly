@@ -7,14 +7,46 @@ if (!process.env.GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
-const parseJsonResponse = (text) => {
-  const clean = text.replace(/```json|```/g, "").trim();
+const extractJSON = (text) => {
+  const candidates = [
+    text,
+    text.replace(/```json|```/g, '').trim(),
+    (() => {
+      const firstBrace = text.indexOf('{');
+      const lastBrace = text.lastIndexOf('}');
+      if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) return text;
+      return text.slice(firstBrace, lastBrace + 1);
+    })(),
+    (() => {
+      const firstBracket = text.indexOf('[');
+      const lastBracket = text.lastIndexOf(']');
+      if (firstBracket === -1 || lastBracket === -1 || lastBracket <= firstBracket) return text;
+      return text.slice(firstBracket, lastBracket + 1);
+    })()
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      // Keep trying narrower slices.
+    }
+  }
+
+  throw new Error('AI returned invalid JSON format.');
+};
+
+const runJsonPrompt = async (prompt, imagePart) => {
+  const firstPass = await model.generateContent(imagePart ? [prompt, imagePart] : prompt);
+  const firstText = (await firstPass.response).text();
+
   try {
-    return JSON.parse(clean);
-  } catch (e) {
-    console.error("Failed to parse JSON:", e);
-    console.error("Original text:", text);
-    throw new Error("AI returned invalid JSON format.");
+    return extractJSON(firstText);
+  } catch (error) {
+    const retryPrompt = `${prompt}\n\nReturn only one valid JSON object. Do not wrap the output in markdown or explanations.`;
+    const secondPass = await model.generateContent(imagePart ? [retryPrompt, imagePart] : retryPrompt);
+    const secondText = (await secondPass.response).text();
+    return extractJSON(secondText);
   }
 };
 
@@ -46,24 +78,7 @@ with no markdown, no backticks, no preamble. Return:
     },
   };
 
-  try {
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = await result.response;
-    const text = response.text();
-    return parseJsonResponse(text);
-  } catch (error) {
-    console.error("Error in analyzeOutfit:", error);
-    // Simple retry logic
-    try {
-      const result = await model.generateContent([prompt + " Please ensure the output is a single, valid JSON object.", imagePart]);
-      const response = await result.response;
-      const text = response.text();
-      return parseJsonResponse(text);
-    } catch (retryError) {
-      console.error("Retry failed in analyzeOutfit:", retryError);
-      throw new Error("Failed to get a valid response from AI after retry.");
-    }
-  }
+  return runJsonPrompt(prompt, imagePart);
 };
 
 /**
@@ -91,15 +106,7 @@ Respond ONLY in valid JSON with no markdown, no backticks, no preamble:
   }]
 }`;
 
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    return parseJsonResponse(text);
-  } catch (error) {
-    console.error("Error in getStyleSuggestions:", error);
-    throw new Error("Failed to get style suggestions from AI.");
-  }
+  return runJsonPrompt(prompt);
 };
 
 /**
@@ -120,15 +127,7 @@ Respond ONLY in valid JSON with no markdown, no backticks, no preamble:
   "fitTips": ["string"]
 }`;
 
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-        return parseJsonResponse(text);
-    } catch (error) {
-        console.error("Error in getBodyTypeRecommendations:", error);
-        throw new Error("Failed to get body type recommendations from AI.");
-    }
+    return runJsonPrompt(prompt);
 };
 
 
@@ -153,15 +152,7 @@ Respond ONLY in valid JSON with no markdown, no backticks, no preamble:
   "wardrobeGaps": ["string"]
 }`;
 
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    return parseJsonResponse(text);
-  } catch (error) {
-    console.error("Error in analyzeTrends:", error);
-    throw new Error("Failed to get trend analysis from AI.");
-  }
+  return runJsonPrompt(prompt);
 };
 
 /**
@@ -183,15 +174,7 @@ Respond ONLY in valid JSON with no markdown, no backticks, no preamble:
   "backgroundSuggestion": "string (e.g., 'Dark Cityscape', 'Minimalist Studio', 'Abstract Gradient')"
 }`;
 
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    return parseJsonResponse(text);
-  } catch (error) {
-    console.error("Error in generateOutfitVisualizerData:", error);
-    throw new Error("Failed to get visualizer data from AI.");
-  }
+  return runJsonPrompt(prompt);
 };
 
 /**

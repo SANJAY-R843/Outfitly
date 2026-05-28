@@ -22,9 +22,10 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 app.use(cors({
-  origin: '*', // Dynamic development mapping
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
